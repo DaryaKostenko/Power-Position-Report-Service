@@ -30,15 +30,14 @@ namespace ReportingService
             {
                 var trades = tradingService.GetTrades(date);
                 var tradesArray = trades as Trade[] ?? trades.ToArray();
+                
                 var volumes = new double[24];
                 volumes = tradesArray.Aggregate(volumes,
                     (aggregatedVolume, trade) => aggregatedVolume
                         .Zip(trade.Periods, (volume, period) => volume + period.Volume).ToArray());
-                var reportInfoList = volumes.Select((volume, i) => new PowerPositionInfo
-                {
-                    LocalTime = TimeSpan.FromHours((i + 6) % 24).ToString(),
-                    Volume = volume
-                }).ToList();
+
+                var periodPowerPositionFactory = new PeriodPowerPositionFactory();
+                var reportInfoList = volumes.Select((volume, i) => periodPowerPositionFactory.GetPowerPositionInfo(i,volume)).ToList();
 
                 var createReportNameHelper = new CreateReportNameHelper(date);
                 var reportName = createReportNameHelper.CreateReportName();
