@@ -1,6 +1,6 @@
-﻿using System.Configuration;
+﻿using System;
+using System.Configuration;
 using System.ServiceProcess;
-
 using System.Threading;
 
 namespace ReportingService
@@ -9,22 +9,22 @@ namespace ReportingService
     {
         private readonly Timer _timer;
         private readonly int _runningInterval;
-        private readonly string _reportLocation;
+        private readonly TimeZoneInfo _gmtTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("GMT Standard Time");
+        private readonly ReportGenerator _reportGenerator;
 
         public ReportService()
         {
             InitializeComponent();
-            _timer = new Timer(WorkProcedure);
             _runningInterval = int.Parse(ConfigurationManager.AppSettings.Get("RunningIntervalInMinutes"));
-            _reportLocation = ConfigurationManager.AppSettings.Get("ReportsLocation");
+            var reportLocation = ConfigurationManager.AppSettings.Get("ReportsLocation");
+            _reportGenerator = new ReportGenerator(reportLocation, _gmtTimeZoneInfo);
+            _timer = new Timer(WorkProcedure);
         }
 
         private void WorkProcedure(object target)
         {
-            var reportGenerator = new ReportGenerator();
-            reportGenerator.GenerateReport(_reportLocation);
+            _reportGenerator.GenerateReport();
         }
-
 
         protected override void OnStart(string[] args)
         {

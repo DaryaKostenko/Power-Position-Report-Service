@@ -3,15 +3,25 @@ using System.IO;
 using System.Linq;
 using CsvHelper;
 using NLog;
+using ReportingService.Helpers;
+using ReportingService.Interfaces;
 using TradingPlatform;
 
 namespace ReportingService
 {
-    public class ReportGenerator
+    public class ReportGenerator : IReportGenerator
     {
-        private readonly TimeZoneInfo _gmtTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("GMT Standard Time");
+        private readonly TimeZoneInfo _gmtTimeZoneInfo;
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
-        public void GenerateReport(string reportPath)
+        private readonly string _reportLocation;
+
+        public ReportGenerator(string reportLocation, TimeZoneInfo gmtTimeZoneInfo)
+        {
+            _reportLocation = reportLocation;
+            _gmtTimeZoneInfo = gmtTimeZoneInfo;
+        }
+
+        public void GenerateReport()
         {
             _logger.Info("Start creating report...");
             var date = TimeZoneInfo.ConvertTime(DateTime.Now, TimeZoneInfo.Local, _gmtTimeZoneInfo);
@@ -30,9 +40,10 @@ namespace ReportingService
                     Volume = volume
                 }).ToList();
 
-                var reportName =
-                    $"PowerPosition_{date.Date.Year}{CheckDisplayNumber(date.Date.Month)}{CheckDisplayNumber(date.Day)}_{CheckDisplayNumber(date.Hour)}{CheckDisplayNumber(date.Minute)}.csv";
-                using (var writer = new StreamWriter(Path.Combine(reportPath, reportName)))
+                var createReportNameHelper = new CreateReportNameHelper(date);
+                var reportName = createReportNameHelper.CreateReportName();
+                   
+                using (var writer = new StreamWriter(Path.Combine(_reportLocation, reportName)))
                 using (var csv = new CsvWriter(writer))
                 {
                     csv.WriteRecords(reportInfoList);
@@ -44,11 +55,6 @@ namespace ReportingService
                 _logger.Error(ex.Message);
                 _logger.Info("Could not create report.");
             }
-        }
-
-        private string CheckDisplayNumber(int number)
-        {
-            return number > 9 ? number.ToString() : $"0{number}";
         }
     }
 }

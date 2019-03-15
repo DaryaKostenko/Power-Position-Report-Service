@@ -65,6 +65,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helpers\CreateReportNameHelper.cs" />
+    <Compile Include="Interfaces\IReportGenerator.cs" />
     <Compile Include="ReportGenerator.cs" />
     <Compile Include="PowerPositionInfo.cs" />
     <Compile Include="ReportService.cs">
@@ -91,5 +93,6 @@
     </None>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
