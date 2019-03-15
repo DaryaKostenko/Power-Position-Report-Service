@@ -2,19 +2,19 @@
 using System.IO;
 using System.Linq;
 using CsvHelper;
+using NLog;
 using TradingPlatform;
 
 namespace ReportingService
 {
-    public static class ReportGenerator
+    public class ReportGenerator
     {
-        private static readonly TimeZoneInfo GmtTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("GMT Standard Time");
-        private static string _logName;
-        public static void GenerateReport(string reportPath)
+        private readonly TimeZoneInfo _gmtTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("GMT Standard Time");
+        private readonly Logger _logger = LogManager.GetCurrentClassLogger();
+        public void GenerateReport(string reportPath)
         {
-            _logName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ServiceProcessService.log");
-            File.AppendAllText(_logName, DateTime.Now.ToLongTimeString() + " Start creating report...\n");
-            var date = TimeZoneInfo.ConvertTime(DateTime.Now, TimeZoneInfo.Local, GmtTimeZoneInfo);
+            _logger.Info("Start creating report...");
+            var date = TimeZoneInfo.ConvertTime(DateTime.Now, TimeZoneInfo.Local, _gmtTimeZoneInfo);
             var tradingService = new TradingService();
             try
             {
@@ -37,16 +37,16 @@ namespace ReportingService
                 {
                     csv.WriteRecords(reportInfoList);
                 }
-                File.AppendAllText(_logName, DateTime.Now.ToLongTimeString() + " Report successfuly created.\n");
+                _logger.Info("Report successfuly created.");
             }
             catch (Exception ex)
             {
-                File.AppendAllText(_logName, DateTime.Now.ToLongTimeString() + " " + ex.Message);
-                File.AppendAllText(_logName, DateTime.Now.ToLongTimeString() + " Could not create report.\n");
+                _logger.Error(ex.Message);
+                _logger.Info("Could not create report.");
             }
         }
 
-        private static string CheckDisplayNumber(int number)
+        private string CheckDisplayNumber(int number)
         {
             return number > 9 ? number.ToString() : $"0{number}";
         }
