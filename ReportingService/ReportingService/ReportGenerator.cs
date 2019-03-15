@@ -39,8 +39,8 @@ namespace ReportingService
                 var periodPowerPositionFactory = new PeriodPowerPositionFactory();
                 var reportInfoList = volumes.Select((volume, i) => periodPowerPositionFactory.GetPowerPositionInfo(i,volume)).ToList();
 
-                var createReportNameHelper = new CreateReportNameHelper(date);
-                var reportName = createReportNameHelper.CreateReportName();
+                var createReportNameHelper = new ReportNameBuilder();
+                var reportName = createReportNameHelper.CreateReportName(date);
                    
                 using (var writer = new StreamWriter(Path.Combine(_reportLocation, reportName)))
                 using (var csv = new CsvWriter(writer))
