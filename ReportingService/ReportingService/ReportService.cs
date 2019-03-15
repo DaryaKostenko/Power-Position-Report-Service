@@ -21,7 +21,8 @@ namespace ReportingService
 
         private void WorkProcedure(object target)
         {
-            ReportGenerator.GenerateReport(_reportLocation);
+            var reportGenerator = new ReportGenerator();
+            reportGenerator.GenerateReport(_reportLocation);
         }
 
 
