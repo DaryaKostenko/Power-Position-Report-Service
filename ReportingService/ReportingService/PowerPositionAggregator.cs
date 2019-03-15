@@ -8,7 +8,7 @@ namespace ReportingService
 {
     public class PowerPositionAggregator : IPowerPositionAggregator
     {
-        public List<IPowerPositionInfo> AggregatePowerPositionByDate(DateTime date, IEnumerable<TradingPeriod[]> periodsList)
+        public List<IPowerPositionInfo> AggregatePowerPositionByDate(IEnumerable<TradingPeriod[]> periodsList)
         {
             try
             {

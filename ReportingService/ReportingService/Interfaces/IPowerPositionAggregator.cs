@@ -6,6 +6,6 @@ namespace ReportingService.Interfaces
 {
     public interface IPowerPositionAggregator
     {
-        List<IPowerPositionInfo> AggregatePowerPositionByDate(DateTime date, IEnumerable<TradingPeriod[]> periodsList);
+        List<IPowerPositionInfo> AggregatePowerPositionByDate(IEnumerable<TradingPeriod[]> periodsList);
     }
 }
